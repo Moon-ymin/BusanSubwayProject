@@ -7,11 +7,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.MalformedURLException;
-import java.net.URISyntaxException;
-
 @RestController
 @RequestMapping("/api")
 public class OpenApiController {
@@ -24,7 +19,7 @@ public class OpenApiController {
     }
 
     @GetMapping("/schedule")
-    public String getSubScheduleData(@RequestParam String sname) throws URISyntaxException, IOException {
+    public String getSubScheduleData(@RequestParam String sname) {
 
         return openApiService.getSubScheduleData(sname);
     }
