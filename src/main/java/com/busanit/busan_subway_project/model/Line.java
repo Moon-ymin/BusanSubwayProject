@@ -16,11 +16,8 @@ import lombok.NoArgsConstructor;
 public class Line {
 
     @Id
-    private int lineCd;         // 호선 코드
+    private Long line_cd;         // 호선 코드
 
     @Column(nullable = false, unique = true)
-    private String lineName;    // 호선명
-
-    @Column
-    private String lineColor;   // 호선 색깔
+    private String line_name;    // 호선명
 }

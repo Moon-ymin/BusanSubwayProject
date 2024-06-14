@@ -10,22 +10,22 @@ import lombok.NoArgsConstructor;
 @Table(name = "station_location")
 @AllArgsConstructor
 @NoArgsConstructor
-public class StationLocation {
+public class Station_Location {
 
-    @Id // ??
+    @Id
     @OneToOne
     @JoinColumn(name = "scode")
     private Station station;    // 역 코드(PK & FK)
 
     @Column(nullable = false)
-    private int x1;
+    private Long x1;
 
     @Column(nullable = false)
-    private int y1;
+    private Long y1;
 
     @Column(nullable = false)
-    private int x2;
+    private Long x2;
 
     @Column(nullable = false)
-    private int y2;
+    private Long y2;
 }
