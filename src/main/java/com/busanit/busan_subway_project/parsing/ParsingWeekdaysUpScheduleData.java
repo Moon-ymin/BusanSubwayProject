@@ -14,7 +14,7 @@ public class ParsingWeekdaysUpScheduleData {
 
     public static void main(String[] args) {
 
-        String inputData = "C:\\Users\\admin\\Desktop\\CSV_Schedule\\Weekdays_Up_Input.csv";
+        String inputData = "C:\\Users\\admin\\Desktop\\CSV_Schedule\\No_Coalesce\\Weekdays_Up_Input.csv";
         String outputData = "C:\\Users\\admin\\Desktop\\CSV_Schedule\\Weekdays_Up_Output.csv";
 
         transformCSV(inputData, outputData);

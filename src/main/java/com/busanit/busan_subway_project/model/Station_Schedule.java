@@ -5,8 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.sql.Time;
-
 @Entity
 @Data
 @Table(name = "station_schedule")
@@ -19,7 +17,7 @@ public class Station_Schedule {
     private Long stn_sc_id;
 
     @Column
-    private Time time;
+    private String time;
 
     @ManyToOne
     @JoinColumn(name = "scode")
