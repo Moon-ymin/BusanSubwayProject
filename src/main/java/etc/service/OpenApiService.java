@@ -1,4 +1,4 @@
-package com.busanit.busan_subway_project.service;
+package etc.service;
 
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;

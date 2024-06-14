@@ -13,12 +13,12 @@ import lombok.NoArgsConstructor;
 public class Station {
 
     @Id
-    private int scode;  // 역 코드
+    private Long scode;  // 역 코드
 
     @Column(nullable = false, unique = true)
     private String sname;           // 역 명
 
     @ManyToOne  // 1:N
-    @JoinColumn(name = "lineCd")
+    @JoinColumn(name = "line_cd")
     private Line line;              // 호선 코드(FK)
 }
