@@ -1,4 +1,4 @@
-package com.busanit.busan_subway_project.dao;
+package com.busanit.busan_subway_project.service;
 
 import com.busanit.busan_subway_project.model.Station;
 import com.busanit.busan_subway_project.repo.StationRepo;
@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-public class StationDao {
+public class StationService {
     @Autowired  // data access object, jpa 쓸 때 필요
     private StationRepo stationRepo;
 
