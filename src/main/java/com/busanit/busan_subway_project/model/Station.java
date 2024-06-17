@@ -24,4 +24,5 @@ public class Station {
 
     @Column(nullable = false)
     private Long exchange;
+
 }
