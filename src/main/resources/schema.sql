@@ -1,11 +1,11 @@
 USE pus_sub_proj_db;
 
-CREATE TABLE line (
+CREATE TABLE IF NOT EXISTS line (
     line_cd INT PRIMARY KEY,
     line_name VARCHAR(45) NOT NULL UNIQUE
 );
 
-CREATE TABLE station (
+CREATE TABLE IF NOT EXISTS station (
     scode INT PRIMARY KEY,
     sname VARCHAR(45) NOT NULL UNIQUE,
     line_cd INT,
@@ -13,7 +13,7 @@ CREATE TABLE station (
     FOREIGN KEY (line_cd) REFERENCES line(line_cd)
 );
 
-CREATE TABLE exchange (
+CREATE TABLE IF NOT EXISTS exchange (
     exchange_id INT PRIMARY KEY,
     scode INT,
     line_cd INT NOT NULL,
@@ -23,7 +23,7 @@ CREATE TABLE exchange (
     FOREIGN KEY (scode) REFERENCES station(scode)
 );
 
-CREATE TABLE station_location (
+CREATE TABLE IF NOT EXISTS station_location (
     scode INT PRIMARY KEY,
     x1 INT NOT NULL,
     y1 INT NOT NULL,
@@ -32,7 +32,7 @@ CREATE TABLE station_location (
     FOREIGN KEY (scode) REFERENCES station(scode)
 );
 
-CREATE TABLE schedule (
+CREATE TABLE IF NOT EXISTS schedule (
     schedule_id INT PRIMARY KEY,
     continuity INT NOT NULL,
     scode INT,
