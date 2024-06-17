@@ -12,8 +12,13 @@ public class StationController {
     @Autowired
     private StationDao stationDao;
 
+    // scode 로 Station 조회하기
     @GetMapping("station/{scode}")
-    public Station getStationByScode(@PathVariable("scode") Integer scode){
+    public Station getStationByScode(@PathVariable Integer scode){
         return stationDao.getSname(scode);
     }
+
+    // sname으로 Station 조회하기
+    @GetMapping("station/name/{sname}")
+    public Station getStationBySname(@PathVariable String sname) { return stationDao.getScode(sname); }
 }

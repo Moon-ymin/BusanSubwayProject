@@ -15,4 +15,10 @@ public class StationDao {
         Station station = stationRepo.findByScode(scode);
         return new Station(station.getScode(), station.getSname(), station.getLine(), station.getExchange());
     }
+
+    // Station 에서 sname으로 sname 반환하는 메서드
+    public Station getScode(String sname) {
+        Station station = stationRepo.findBySname(sname);
+        return new Station(station.getScode(), station.getSname(), station.getLine(), station.getExchange());
+    }
 }
