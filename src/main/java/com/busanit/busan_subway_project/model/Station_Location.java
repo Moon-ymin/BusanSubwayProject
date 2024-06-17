@@ -13,7 +13,10 @@ import lombok.NoArgsConstructor;
 public class Station_Location {
 
     @Id
+    private Long scode;
+
     @OneToOne
+    @MapsId
     @JoinColumn(name = "scode")
     private Station station;    // 역 코드(PK & FK)
 
