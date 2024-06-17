@@ -21,4 +21,7 @@ public class Station {
     @ManyToOne  // 1:N
     @JoinColumn(name = "line_cd")
     private Line line;              // 호선 코드(FK)
+
+    @Column(nullable = false)
+    private Long exchange;
 }

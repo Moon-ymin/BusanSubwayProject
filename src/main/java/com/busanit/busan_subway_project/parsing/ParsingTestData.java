@@ -37,7 +37,7 @@ public class ParsingTestData {
     public static List<String[]> transformData(List<String[]> data) {
         List<String[]> transformedData = new ArrayList<>();
 
-        transformedData.add(new String[]{"id", "sname", "schdeule", "direction", "day"});
+        transformedData.add(new String[]{"schedule_id", "continuity", "scode", "arrival_time", "direction", "day"});
 
         int id = 1;
         for (String[] row : data) {
