@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.sql.Time;
+
 @Entity
 @Data
 @Table(name = "schedule")
@@ -24,7 +26,7 @@ public class Schedule {
     Station station;
 
     @Column(nullable = false)
-    private String arrival_time;
+    private Time arrival_time;
 
     @Column
     private Long direction; // 상하행 구분(상행 : 1, 하행 : 2)

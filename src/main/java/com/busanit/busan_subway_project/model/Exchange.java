@@ -5,6 +5,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.sql.Time;
+
 @Entity
 @Data
 @Table(name = "exchange")
@@ -30,5 +32,5 @@ public class Exchange {
     private Long ex_line_cd;
 
     @Column
-    private Long waling_time;
+    private Time walking_time;
 }
