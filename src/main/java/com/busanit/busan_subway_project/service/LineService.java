@@ -1,4 +1,4 @@
-package com.busanit.busan_subway_project.dao;
+package com.busanit.busan_subway_project.service;
 
 import com.busanit.busan_subway_project.model.Line;
 import com.busanit.busan_subway_project.repo.LineRepo;
@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-public class LineDao {
+public class LineService {
     @Autowired
     private LineRepo lineRepo;
 

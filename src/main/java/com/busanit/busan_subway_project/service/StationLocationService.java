@@ -1,13 +1,12 @@
-package com.busanit.busan_subway_project.dao;
+package com.busanit.busan_subway_project.service;
 
-import com.busanit.busan_subway_project.model.Station;
 import com.busanit.busan_subway_project.model.Station_Location;
 import com.busanit.busan_subway_project.repo.StationLocationRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-public class StationLocationDao {
+public class StationLocationService {
     @Autowired
     private StationLocationRepo stationLocationRepo;
 
