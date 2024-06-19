@@ -15,7 +15,7 @@ public class Station {
     @Id
     private Long scode;  // 역 코드
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private String sname;           // 역 명
 
     @ManyToOne  // 1:N
@@ -24,5 +24,4 @@ public class Station {
 
     @Column(nullable = false)
     private Long exchange;
-
 }

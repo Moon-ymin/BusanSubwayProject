@@ -7,10 +7,10 @@ CREATE TABLE IF NOT EXISTS line (
 
 CREATE TABLE IF NOT EXISTS station (
     scode INT PRIMARY KEY,
-    sname VARCHAR(45) NOT NULL UNIQUE,
+    sname VARCHAR(45) NOT NULL,
     line_cd INT,
     exchange INT NOT NULL,
-    FOREIGN KEY (line_cd) REFERENCES line(line_cd)
+    FOREIGN KEY (line_cd) REFERENCES line(line_cd) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS exchange (
@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS exchange (
     ex_scode INT NOT NULL,
     ex_line_cd INT,
     walking_time TIME,
-    FOREIGN KEY (scode) REFERENCES station(scode)
+    FOREIGN KEY (scode) REFERENCES station(scode) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS station_location (
@@ -29,7 +29,7 @@ CREATE TABLE IF NOT EXISTS station_location (
     y1 INT NOT NULL,
     x2 INT NOT NULL,
     y2 INT NOT NULL,
-    FOREIGN KEY (scode) REFERENCES station(scode)
+    FOREIGN KEY (scode) REFERENCES station(scode) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS schedule (
@@ -39,5 +39,5 @@ CREATE TABLE IF NOT EXISTS schedule (
     arrival_time TIME NOT NULL,
     direction INT,
     day INT,
-    FOREIGN KEY (scode) REFERENCES station(scode)
+    FOREIGN KEY (scode) REFERENCES station(scode) ON DELETE CASCADE
 );
