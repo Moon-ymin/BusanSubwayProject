@@ -21,14 +21,14 @@ public class Station_Location {
     private Station station;    // 역 코드(PK & FK)
 
     @Column(nullable = false)
-    private Long x1;
+    private int x1;
 
     @Column(nullable = false)
-    private Long y1;
+    private int y1;
 
     @Column(nullable = false)
-    private Long x2;
+    private int x2;
 
     @Column(nullable = false)
-    private Long y2;
+    private int y2;
 }

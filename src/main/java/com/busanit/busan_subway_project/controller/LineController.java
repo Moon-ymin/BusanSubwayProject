@@ -14,7 +14,7 @@ public class LineController {
     private LineService lineService;
 
     @GetMapping("/line/{line_cd}")
-    public Line getLineByCode(@PathVariable("line_cd") Long line_cd){
+    public Line getLineByCode(@PathVariable("line_cd") int line_cd){
         return lineService.getLine(line_cd);
     }
 }

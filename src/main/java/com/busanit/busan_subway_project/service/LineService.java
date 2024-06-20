@@ -11,7 +11,7 @@ public class LineService {
     private LineRepo lineRepo;
 
     // line-cd 로 Line 출력 메서드
-    public Line getLine(Long line_cd){
+    public Line getLine(int line_cd){
         Line line = lineRepo.findByLineCd(line_cd);
         return new Line(line.getLineCd(), line.getLineName());
     }

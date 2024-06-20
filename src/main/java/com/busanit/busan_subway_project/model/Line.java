@@ -17,7 +17,7 @@ public class Line {
 
     @Id
     @Column(name = "line_cd")
-    private Long lineCd;         // 호선 코드
+    private int lineCd;         // 호선 코드
 
     @Column(name = "line_name", nullable = false, unique = true)
     private String lineName;    // 호선명

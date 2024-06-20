@@ -1,4 +1,4 @@
-package com.busanit.busan_subway_project.metro;
+package com.busanit.busan_subway_project.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
