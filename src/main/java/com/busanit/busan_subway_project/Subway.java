@@ -3,20 +3,20 @@ package com.busanit.busan_subway_project;
 import java.util.*;
 
 public class Subway {
-    static class Stage {  // 지하철 역 나타내는 클래스
+    public static class Stage {  // 지하철 역 나타내는 클래스
         int code;   // 역 코드 넣을거임
-        List<Edge> edges = new ArrayList<>();
+        public List<Edge> edges = new ArrayList<>();
 
-        Stage(int code) {
+        public Stage(int code) {
             this.code = code;
         }
     }
-    static class Edge { // 연결된 역의 코드, 호선 코드, 이동 시간
+    public static class Edge { // 연결된 역의 코드, 호선 코드, 이동 시간
         int code;
         int line;
         int travelTime;
 
-        Edge(int code, int line, int travelTime) {
+        public Edge(int code, int line, int travelTime) {
             this.code = code;
             this.line = line;
             this.travelTime = travelTime;
@@ -56,7 +56,7 @@ public class Subway {
             }
         }
     }
-    static class Result {   // 최종 결과 저장 : (Route)경로 리스트, 환승 횟수, 총 소요 시간
+    public static class Result {   // 최종 결과 저장 : (Route)경로 리스트, 환승 횟수, 총 소요 시간
         List<String> path;
         int transfers;
         int totalTime;

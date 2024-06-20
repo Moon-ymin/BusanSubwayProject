@@ -1,32 +1,81 @@
 package com.busanit.busan_subway_project.controller;
 
+import com.busanit.busan_subway_project.Subway;
 import com.busanit.busan_subway_project.model.LocationData;
+import com.busanit.busan_subway_project.model.Metro;
+import com.busanit.busan_subway_project.model.ResultWrapper;
+import com.busanit.busan_subway_project.model.Station;
+import com.busanit.busan_subway_project.service.MetroService;
+import com.busanit.busan_subway_project.service.StationService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 @RestController
 @RequestMapping("/api")
 public class LocationController {
+    @Autowired
+    private StationService stationService;
+    @Autowired
+    private MetroService metroService;
 
     @PostMapping("/location")
-    public String receiveLocationData(@RequestBody LocationData locationData) {
-        // 안드로이드로부터 받은 (출발, 경유, 도착) 데이터
+    public ResultWrapper receiveLocationData(@RequestBody LocationData locationData) {
+        // 1. 안드로이드로부터 받은 (출발, 경유, 도착) 데이터
         Integer from = locationData.getFrom();
         Integer via = locationData.getVia();
         Integer to = locationData.getTo();
 
-        // 다른 비즈니스 로직 수행!!
-        // 최소환승, 최단경로 메서드 수행하기
+        // 2. 최소환승, 최단경로 메서드 수행하기
+        // 1) 객체 생성
+        Map<Integer, Integer> stages = new HashMap<>();   // 모든 역의 scode, line_cd 저장
+        Map<Integer, Subway.Stage> subwayMap = new HashMap<>();  // 생성되는 모든 객체 저장
 
-        // 예제로서 간단하게 받은 데이터를 로그에 출력하고 응답을 반환
-        System.out.println("Received location data:");
-        System.out.println("From: " + from);
-        System.out.println("Via: " + via);
-        System.out.println("To: " + to);
+        // Station 테이블의 모든 scode와 lineCd 값을 가져와서 stages에 추가
+        List<Station> stations = stationService.getAllStations();
+        for (Station s : stations) {
+            stages.put(s.getScode(), s.getLine().getLineCd());
+        }
 
-        // 안드로이드로 응답 반환
-        return "Location data received successfully!";
+        // 반복문을 통한 노드 객체 생성
+        for (Integer key : stages.keySet()) {  // scode 가 key임
+            Subway.Stage stage = new Subway.Stage(key);
+            subwayMap.put(key, stage);
+        }
+
+        // 2) 엣지 연결
+        // key 와 metro 테이블의 start_sc 인 행 가져와서 매번 edge 추가
+        // (metro.end_sc, station.line_cd, metro.time) 필요
+        // subwayMap.get(95).edges.add(new Subway.Edge(96,1,5));
+        List<Metro> metros = metroService.getAllMetros();
+        for (Integer key : stages.keySet()) {
+            Integer lineCd = stages.get(key);  // station.line_cd
+            Subway.Stage startStage = subwayMap.get(key);
+            for(Metro metro : metros) {
+                if (metro.getStartSc() == key.intValue()){
+                    Subway.Edge edge = new Subway.Edge(metro.getEndSc(),
+                            lineCd.intValue(), metro.getTime());
+                    startStage.edges.add(edge);
+                }
+            }
+            // 3) subwayMap 객체 추가
+            subwayMap.put(key, startStage);
+        }
+
+        // 3. 결과 안드로이드에 전송하기
+        // 최소환승 경로 및 최단시간 경로 계산
+        Subway.Result minTransferResult = Subway.minTransferRoute(subwayMap, from, to);
+        Subway.Result minTimeResult = Subway.minTimeRoute(subwayMap, from, to);
+
+        // 결과를 안드로이드로 전송할 객체 생성
+        ResultWrapper resultWrapper = new ResultWrapper(minTransferResult, minTimeResult);
+
+        return resultWrapper;
     }
 }
