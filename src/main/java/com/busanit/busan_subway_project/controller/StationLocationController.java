@@ -13,7 +13,7 @@ public class StationLocationController {
     private StationLocationService stationLocationService;
 
     @GetMapping("stationlocation/{scode}")
-    public Station_Location getSLByScode(@PathVariable Long scode){
+    public Station_Location getSLByScode(@PathVariable Integer scode){
         return stationLocationService.getStationLocation(scode);
     }
 

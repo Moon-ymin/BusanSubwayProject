@@ -23,6 +23,7 @@ import java.util.List;
 public class MetroService {
 
     private final ApiService apiService;
+    @Autowired
     private final MetroRepo metroRepo;
     private final StationRepo stationRepo;
 
@@ -43,7 +44,7 @@ public class MetroService {
         }
     }
 
-    private void getAndSaveMetroData(String act, Long scode) {
+    private void getAndSaveMetroData(String act, int scode) {
         try {
             String encodedApiKey = URLEncoder.encode(serviceKey, StandardCharsets.UTF_8);
             String decodedApiKey = URLDecoder.decode(encodedApiKey, StandardCharsets.UTF_8);

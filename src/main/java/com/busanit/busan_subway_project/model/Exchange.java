@@ -16,20 +16,20 @@ public class Exchange {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long exchange_id;
+    private int exchange_id;
 
     @OneToOne
     @JoinColumn(name = "scode")
     Station station;
 
     @Column(nullable = false)
-    private Long line_cd;
+    private int line_cd;
 
     @Column(nullable = false)
-    private Long ex_scode;
+    private int ex_scode;
 
     @Column(nullable = false)
-    private Long ex_line_cd;
+    private int ex_line_cd;
 
     @Column
     private Time walking_time;

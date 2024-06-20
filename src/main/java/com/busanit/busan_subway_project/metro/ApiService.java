@@ -9,6 +9,6 @@ public interface ApiService {
     Call<MetroResponse> getMetroApi(
             @Query("serviceKey") String serviceKey,
             @Query("act") String act,
-            @Query("scode") Long scode
+            @Query("scode") int scode
     );
 }

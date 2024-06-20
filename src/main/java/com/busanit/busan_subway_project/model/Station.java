@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 public class Station {
 
     @Id
-    private Long scode;  // 역 코드
+    private int scode;  // 역 코드
 
     @Column(nullable = false, unique = true)
     private String sname;           // 역 명
@@ -23,6 +23,6 @@ public class Station {
     private Line line;              // 호선 코드(FK)
 
     @Column(nullable = false)
-    private Long exchange;
+    private int exchange;
 
 }

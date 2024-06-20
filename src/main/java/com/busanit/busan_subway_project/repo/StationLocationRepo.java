@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface StationLocationRepo extends JpaRepository<Station_Location, Long> {
+public interface StationLocationRepo extends JpaRepository<Station_Location, Integer> {
     // Station_Location의 PK는 Station
-    Station_Location findStationLocationByScode(Long scode);
+    Station_Location findStationLocationByScode(int scode);
 }

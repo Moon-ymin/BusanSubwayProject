@@ -16,10 +16,10 @@ public class Schedule {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long schedule_id;     // 스케줄 ID(인조 식별자)
+    private int schedule_id;     // 스케줄 ID(인조 식별자)
 
     @Column(nullable = false)
-    private Long continuity;
+    private int continuity;
 
     @ManyToOne
     @JoinColumn(name = "scode")
@@ -29,8 +29,8 @@ public class Schedule {
     private Time arrival_time;
 
     @Column
-    private Long direction; // 상하행 구분(상행 : 1, 하행 : 2)
+    private int direction; // 상하행 구분(상행 : 1, 하행 : 2)
 
     @Column
-    private Long day; // 요일 구분(평일 : 1, 토요일 : 2, 공휴일 : 3)
+    private int day; // 요일 구분(평일 : 1, 토요일 : 2, 공휴일 : 3)
 }
