@@ -47,8 +47,8 @@ public class Subway {
     }
     public static class Result {   // 최종 결과 저장 : (Route)경로 리스트, 환승 횟수, 총 소요 시간
         public List<String> path;
-        int transfers;
-        int totalTime;
+        public int transfers;
+        public int totalTime;
 
         public Result(List<String> path, int transfers, int totalTime) {
             this.path = path;

@@ -105,10 +105,22 @@ public class LocationController {
         }
 
         // schedule 테이블 연결, 운행 시간표 적용
+        minTransferResult = applySchedule(minTransferResult);
+        minTimeResult = applySchedule(minTimeResult);
 
         // 결과를 안드로이드로 전송할 객체 생성
         ResultWrapper resultWrapper = new ResultWrapper(minTransferResult, minTimeResult);
 
         return resultWrapper;
+    }
+    private Subway.Result applySchedule(Subway.Result result){
+        // 환승하는 경우
+
+
+        String startPath = result.path.get(0);  // scode|sname|line_cd
+        String endPath = result.path.get(result.path.size()-1);  // scode|sname|line_cd
+
+
+        return result;
     }
 }
