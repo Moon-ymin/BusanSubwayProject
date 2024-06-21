@@ -27,7 +27,7 @@ public class MetroService {
     private final MetroRepo metroRepo;
     private final StationRepo stationRepo;
 
-    @Value("${humetro-api-key}")
+    @Value("${open-api-key}")
     private String serviceKey;
 
     @Autowired

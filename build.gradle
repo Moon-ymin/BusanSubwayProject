@@ -51,6 +51,11 @@ dependencies {
 	implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
 	// https://mvnrepository.com/artifact/com.squareup.retrofit2/retrofit
 	implementation 'com.squareup.retrofit2:retrofit:2.9.0'
+
+	// 공휴일 여부 확인 OpenAPI 활용
+	implementation 'org.springframework.boot:spring-boot-starter-json'
+	implementation 'org.springframework:spring-web'
+	implementation 'com.squareup.okhttp3:okhttp:4.9.1'
 }
 
 tasks.named('test') {

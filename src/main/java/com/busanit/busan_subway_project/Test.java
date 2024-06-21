@@ -3,6 +3,7 @@ package com.busanit.busan_subway_project;
 import com.busanit.busan_subway_project.model.Metro;
 import com.busanit.busan_subway_project.model.Schedule;
 import com.busanit.busan_subway_project.model.Station;
+import com.busanit.busan_subway_project.service.HolidayService;
 import com.busanit.busan_subway_project.service.MetroService;
 import com.busanit.busan_subway_project.service.ScheduleService;
 import com.busanit.busan_subway_project.service.StationService;
@@ -12,9 +13,12 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import java.sql.Time;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.time.LocalTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 @SpringBootApplication
 public class Test implements CommandLineRunner {
@@ -23,7 +27,11 @@ public class Test implements CommandLineRunner {
     @Autowired
     private MetroService metroService;
     @Autowired
+    private HolidayService holidayService;
+    @Autowired
     private ScheduleService scheduleService;
+    private LocalDate localDate;
+    private LocalTime time;
 
 
     public static void main(String[] args) {
@@ -86,38 +94,89 @@ public class Test implements CommandLineRunner {
         Result = applySchedule(Result);
         Result2 = applySchedule(Result2);
 
-
-        /*if (Result != null) {
-            System.out.println("Minimum transfers: " + Result.transfers);
-            System.out.println("Total time: " + Result.totalTime);
-            System.out.println("Path: " + Result.path);
-        } else {
-            System.out.println("No path found");
-        }*/
     }
-    private Subway.Result applySchedule(Subway.Result result){
-        // 현재 시간
+    // 운행 시간표 추가하는 메서드
+    private Subway.Result applySchedule(Subway.Result result) {
+        // time : Time 타입, 일단은 현재 시간 넣을 거임
+        time = LocalTime.now();    // 19:15:49.934230
 
-        // 환승하는 경우
-        if (result.transfers == 0) {
-
-        } else {    // 환승없는 경우 : 걍 바로 path의 String 뒤에 운행스케줄 붙이면 됨
-            String startPath = result.path.get(0);  // scode|sname|line_cd
-            String endPath = result.path.get(result.path.size()-1);  // scode|sname|line_cd
-
-            int startSc = Integer.parseInt(startPath.split("\\|")[0]);
-            int endSc = Integer.parseInt(endPath.split("\\|")[0]);
-
-            int direction = startSc < endSc ? 1 : 2; // 상행 1, 하행 2
-            // int day = ; // day 는 어케할겨?
-            List<Schedule> schedules = scheduleService.getSchedules(direction, 1, startSc, new Time(System.currentTimeMillis()), endSc);
-            System.out.println(schedules);
-
+        // day : (평일 : 1, 토요일 : 2, 공휴일 : 3)
+        localDate = LocalDate.now();    // 현재 서버 날짜
+        //LocalDate customdate = LocalDate.of(2024,6,6); // 커스텀 날짜
+        int day;
+        if ( holidayService.isHoliday(localDate) ){ // 먼저 공휴일인지 확인
+            day = 3;
+        } else {    // 공휴일 아니라면
+            switch ( localDate.getDayOfWeek() ){
+                case SUNDAY: day = 3; break;    // 일요일이면 3
+                case SATURDAY: day = 2; break;  // 토요일이면 2
+                default: day = 1; break;        // 그 외 평일이면 1
+            }
         }
+        // 추가로 direction, scode(start, end) 필요
+        if (result.transfers != 0) {    // 환승인 경우
+            List<List<String>> paths = splitTransferPaths(result.path);
+            Time arrivalTime = null;
+            for(List<String> p : paths){
+                int startCd = Integer.parseInt(p.get(0).split("\\|")[0]);
+                int endCd = Integer.parseInt(p.get(p.size()-1).split("\\|")[0]);
+                int direction = startCd < endCd ? 1 : 2;
+                int small = 0; int big = 0;
+                if (startCd < endCd) {
+                    small = startCd; big = endCd;
+                } else {
+                    small = endCd; big = startCd;
+                }
+                List<Schedule> schedules = scheduleService.getSchedules(startCd, small, big, time, direction, day);
 
 
+                for (int i = 0; i < p.size(); i++) {
+                    String change = result.path.get(i);
+                    arrivalTime = schedules.get(i).getArrival_time();
+                    change += "|" + arrivalTime.toString();  // 운행 시간표까지 붙이기
+                    result.path.set(i, change);
+                }
+                time = arrivalTime.toLocalTime();
+            }
+        } else {    // 환승아닌경우
+            int startCd = Integer.parseInt(result.path.get(0).split("\\|")[0]); // scode|sname|line_cd
+            int endCd = Integer.parseInt(result.path.get(result.path.size() - 1)
+                    .split("\\|")[0]);
+            int direction = startCd < endCd ? 1 : 2;
+            int small = 0; int big = 0;
+            if (startCd < endCd) {
+                small = startCd; big = endCd;
+            } else {
+                small = endCd; big = startCd;
+            }
+            List<Schedule> schedules = scheduleService.getSchedules(startCd, small, big, time, direction, day);
 
+            for (int i = 0; i < schedules.size(); i++) {
+                String change = result.path.get(i);
+                change += "|" + schedules.get(i).getArrival_time().toString();  // 운행 시간표까지 붙이기
+                result.path.set(i, change);
+            }
+        }
 
         return result;
     }
+    private List<List<String>> splitTransferPaths(List<String> resultpath){
+        List<List<String>> transferLines = new ArrayList<>(); // 호선 다른 경로끼리 묶여진 이중 배열
+        List<String> currentLine = new ArrayList<>();  // 호선 같은 애들 담은 배열
+        String preLine = null;
+
+        for (String path : resultpath) {
+            String lineCd = path.split("\\|")[2];
+            if (preLine != null && !lineCd.equals(preLine)) { // 환승했을 경우
+                transferLines.add(currentLine);
+                currentLine = new ArrayList<>();
+            }
+            currentLine.add(path);
+            preLine = lineCd;
+        }
+        if (!currentLine.isEmpty()) transferLines.add(currentLine); // 마지막 경로 담기
+
+        return transferLines;
+    }
+
 }
