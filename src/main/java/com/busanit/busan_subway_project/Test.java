@@ -9,9 +9,9 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.*;
-
-import static com.busanit.busan_subway_project.Subway.combineResults;
 
 @SpringBootApplication
 public class Test implements CommandLineRunner {
@@ -72,11 +72,12 @@ public class Test implements CommandLineRunner {
             // 3. subwayMap 객체 추가
             subwayMap.put(key, startStage);
         }
-// 212, 243
-        Subway.Result Result = Subway.minTransferRoute(subwayMap, 122, 209);
-        Subway.Result Result2 = Subway.minTimeRoute(subwayMap, 122, 209);
+// 122, 209
+        Subway.Result Result = Subway.minTransferRoute(subwayMap, 912, 917);
+        Subway.Result Result2 = Subway.minTimeRoute(subwayMap, 912, 917);
 
         // schedule 테이블 연결, 운행 시간표 적용
+        LocalTime time = LocalDateTime.now().toLocalTime();
 
 
         if (Result != null) {
