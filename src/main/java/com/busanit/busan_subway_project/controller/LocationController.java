@@ -17,6 +17,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.busanit.busan_subway_project.Subway.combineResults;
+
 @RestController
 @RequestMapping("/api")
 public class LocationController {
@@ -80,10 +82,29 @@ public class LocationController {
             subwayMap.put(key, startStage);
         }
 
-        // 3. 결과 안드로이드에 전송하기
-        // 최소환승 경로 및 최단시간 경로 계산
-        Subway.Result minTransferResult = Subway.minTransferRoute(subwayMap, from, to);
-        Subway.Result minTimeResult = Subway.minTimeRoute(subwayMap, from, to);
+        // 3. 결과 안드로이드에 전송하기 - 최소환승 경로 및 최단시간 경로 계산
+        Subway.Result minTransferResult;
+        Subway.Result minTimeResult;
+        if (via != 0) {   // 경유지 있는 경우 : from - via, via - to 경로 두 개 생각해서 더하기
+            // from - via
+            Subway.Result minTransferResult1 = Subway.minTransferRoute(subwayMap, from, via);
+            Subway.Result minTimeResult1 = Subway.minTimeRoute(subwayMap, from, via);
+
+            // via - to
+            Subway.Result minTransferResult2 = Subway.minTransferRoute(subwayMap, via, to);
+            Subway.Result minTimeResult2 = Subway.minTimeRoute(subwayMap, via, to);
+
+            // 합친 결과
+            minTransferResult = combineResults(minTransferResult1, minTransferResult2);
+            minTimeResult = combineResults(minTimeResult1, minTimeResult2);
+
+
+        } else {    // 경유지 없는 경우
+            minTransferResult = Subway.minTransferRoute(subwayMap, from, to);
+            minTimeResult = Subway.minTimeRoute(subwayMap, from, to);
+        }
+
+        // schedule 테이블 연결, 운행 시간표 적용
 
         // 결과를 안드로이드로 전송할 객체 생성
         ResultWrapper resultWrapper = new ResultWrapper(minTransferResult, minTimeResult);

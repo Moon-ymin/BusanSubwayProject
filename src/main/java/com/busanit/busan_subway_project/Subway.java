@@ -47,7 +47,7 @@ public class Subway {
 
 
         // 생성자 오버로드 : 최단시간 경로 구할 때 사용
-        Route(int code, String name, int totalTime, int transfers, List<String> path) {
+        /*Route(int code, String name, int totalTime, int transfers, List<String> path) {
             this.code = code;
             this.name = name;
             this.totalTime = totalTime;
@@ -62,9 +62,9 @@ public class Subway {
                     this.path.add(code + "|" + (path.isEmpty() ? -1 : path.get(path.size() - 1).split("\\|")[1]));
                 }
             } else {
-                this.path.add(code + "|-1"); // 첫 번째 경로 추가
+                this.path.add(code + "|" + name +"|" + line); // 첫 번째 경로 추가
             }
-        }
+        }*/
     }
     public static class Result {   // 최종 결과 저장 : (Route)경로 리스트, 환승 횟수, 총 소요 시간
         List<String> path;
@@ -76,6 +76,17 @@ public class Subway {
             this.transfers = transfers;
             this.totalTime = totalTime;
         }
+
+        public void merge(Result other) {
+            // 중복되지 않게 다른 경로의 첫 번째 역을 제외하고 병합
+            if (!this.path.isEmpty() && !other.path.isEmpty()) {
+                this.path.addAll(other.path.subList(1, other.path.size()));
+            } else {
+                this.path.addAll(other.path);
+            }
+            this.transfers += other.transfers;
+            this.totalTime += other.totalTime;
+        }
     }
 
     // 최소환승 minTransferRoute 메서드, 다익스트라 알고리즘 적용
@@ -86,7 +97,7 @@ public class Subway {
 
         // 2. 시작 노드의 Route 객체를 생성해 큐에 먼저 추가, 시작의 line 은 -1로 표시
         Stage startStage = subwayMap.get(start);
-        Route initialRoute = new Route(startStage.code, startStage.name, -1, 0, 0, new ArrayList<>());
+        Route initialRoute = new Route(startStage.code, startStage.name, startStage.line_cd, 0, 0, new ArrayList<>());
         pq.offer(initialRoute);
         shortestPaths.put(start, initialRoute);
 
@@ -107,7 +118,7 @@ public class Subway {
             for (Edge edge : subwayMap.get(currentCode).edges) {
                 int neighborCode = edge.code;
                 Stage neighborStage = subwayMap.get(neighborCode);
-                int neighborLine = edge.line;
+                int neighborLine = subwayMap.get(neighborCode).line_cd;
                 int travelTime = edge.travelTime;
                 int newTime = currentTime + travelTime;
                 int newTransfers = currentTransfers + (currentLine != neighborLine ? 1 : 0); // 환승여부 확인
@@ -124,7 +135,7 @@ public class Subway {
     }
 
     // 최단시간 minTimeRoute 메서드, 다익스트라 알고리즘 적용
-    public static Result minTimeRoute(Map<Integer, Stage> subwayMap, int start, int end) {
+    /*public static Result minTimeRoute(Map<Integer, Stage> subwayMap, int start, int end) {
         // 1. 초기 변수 설정 : 결과를 저장할 변수들
         List<String> path = new ArrayList<>();
         int transfers = -1;
@@ -167,5 +178,59 @@ public class Subway {
         }
         // 도착 역에 도달하지 못한 경우
         return new Result(path, transfers, totalTime);
+    }*/
+    public static Result minTimeRoute(Map<Integer, Stage> subwayMap, int start, int end){
+        // 우선순위 큐 생성 : 이동 시간(totalTime) 기준으로 정렬하는 우선순위 큐 생성
+        Map<Integer, Route> shortestPaths = new HashMap<>(); // 같은 경로 중복 저장되는거 막기 위해
+        PriorityQueue<Route> pq = new PriorityQueue<>(Comparator.comparingInt(r -> r.totalTime));
+
+        // 시작 역을 큐에 추가
+        Stage startStage = subwayMap.get(start);
+        Route initialRoute = new Route(startStage.code, startStage.name, startStage.line_cd, 0, 0, new ArrayList<>());
+        pq.offer(initialRoute);
+        shortestPaths.put(start, initialRoute);
+
+        while (!pq.isEmpty()) { // 탐색 루프 : 큐가 비어있지 않은 동안 반복
+            // 큐에서 가장 적은 이동시간 가진 Route 객체 꺼냄
+            Route current = pq.poll();
+            int currentCode = current.code;
+            Stage currentStage = subwayMap.get(currentCode);
+            int currentTransfers = current.transfers;
+            int currentTime = current.totalTime;
+            List<String> currentPath = current.path;
+
+            // 목적지에 도달한 경우 -> 결과 반환
+            if (currentCode == end) {
+                return new Result(currentPath, currentTransfers, currentTime);
+            }
+
+            // 인접 역을 탐색하여 최소시간 경로를 찾음
+            for (Edge edge : subwayMap.get(currentCode).edges) {
+                Stage nextStage = subwayMap.get(edge.code);
+                int travelTime = edge.travelTime;
+                int newTotalTime = travelTime + currentTime;
+                int newTransfers = currentTransfers + (currentStage.line_cd != nextStage.line_cd ? 1 : 0);
+
+                // 새 경로 생성 및 우선순위 큐에 추가
+                if (!shortestPaths.containsKey(edge.code) || newTotalTime < shortestPaths.get(edge.code).totalTime) {
+                    Route newRoute = new Route(edge.code, nextStage.name, nextStage.line_cd, newTransfers, newTotalTime, currentPath);
+                    shortestPaths.put(edge.code, newRoute);
+                    pq.offer(newRoute);
+                }
+            }
+        }
+        return null;
+    }
+
+
+    // 경유지가 있는 경우, 두 경로를 합치는 메서드
+    public static Result combineResults(Result result1, Result result2) {
+        if (result1 == null || result2 == null) {
+            return null;
+        }
+
+        Result combinedResult = new Result(new ArrayList<>(result1.path), result1.transfers, result1.totalTime);
+        combinedResult.merge(result2);
+        return combinedResult;
     }
 }

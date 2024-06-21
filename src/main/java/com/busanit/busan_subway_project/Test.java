@@ -11,6 +11,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import java.util.*;
 
+import static com.busanit.busan_subway_project.Subway.combineResults;
+
 @SpringBootApplication
 public class Test implements CommandLineRunner {
     @Autowired
@@ -73,6 +75,10 @@ public class Test implements CommandLineRunner {
 // 212, 243
         Subway.Result Result = Subway.minTransferRoute(subwayMap, 122, 209);
         Subway.Result Result2 = Subway.minTimeRoute(subwayMap, 122, 209);
+
+        // schedule 테이블 연결, 운행 시간표 적용
+
+
         if (Result != null) {
             System.out.println("Minimum transfers: " + Result.transfers);
             System.out.println("Total time: " + Result.totalTime);
