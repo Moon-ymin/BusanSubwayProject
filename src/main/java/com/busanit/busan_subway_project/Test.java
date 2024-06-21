@@ -1,14 +1,19 @@
 package com.busanit.busan_subway_project;
 
 import com.busanit.busan_subway_project.model.Metro;
+import com.busanit.busan_subway_project.model.Schedule;
 import com.busanit.busan_subway_project.model.Station;
 import com.busanit.busan_subway_project.service.MetroService;
+import com.busanit.busan_subway_project.service.ScheduleService;
 import com.busanit.busan_subway_project.service.StationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
+import java.sql.Time;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.*;
 
 @SpringBootApplication
@@ -17,6 +22,9 @@ public class Test implements CommandLineRunner {
     private StationService stationService;
     @Autowired
     private MetroService metroService;
+    @Autowired
+    private ScheduleService scheduleService;
+
 
     public static void main(String[] args) {
         SpringApplication.run(Test.class,args);
@@ -70,15 +78,46 @@ public class Test implements CommandLineRunner {
             // 3. subwayMap 객체 추가
             subwayMap.put(key, startStage);
         }
-// 212, 243
-        Subway.Result Result = Subway.minTransferRoute(subwayMap, 122, 209);
-        Subway.Result Result2 = Subway.minTimeRoute(subwayMap, 122, 209);
-        if (Result != null) {
+// 122, 209
+        Subway.Result Result = Subway.minTransferRoute(subwayMap, 912, 917);
+        Subway.Result Result2 = Subway.minTimeRoute(subwayMap, 912, 917);
+
+        // schedule 테이블 연결, 운행 시간표 적용
+        Result = applySchedule(Result);
+        Result2 = applySchedule(Result2);
+
+
+        /*if (Result != null) {
             System.out.println("Minimum transfers: " + Result.transfers);
             System.out.println("Total time: " + Result.totalTime);
             System.out.println("Path: " + Result.path);
         } else {
             System.out.println("No path found");
+        }*/
+    }
+    private Subway.Result applySchedule(Subway.Result result){
+        // 현재 시간
+
+        // 환승하는 경우
+        if (result.transfers == 0) {
+
+        } else {    // 환승없는 경우 : 걍 바로 path의 String 뒤에 운행스케줄 붙이면 됨
+            String startPath = result.path.get(0);  // scode|sname|line_cd
+            String endPath = result.path.get(result.path.size()-1);  // scode|sname|line_cd
+
+            int startSc = Integer.parseInt(startPath.split("\\|")[0]);
+            int endSc = Integer.parseInt(endPath.split("\\|")[0]);
+
+            int direction = startSc < endSc ? 1 : 2; // 상행 1, 하행 2
+            // int day = ; // day 는 어케할겨?
+            List<Schedule> schedules = scheduleService.getSchedules(direction, 1, startSc, new Time(System.currentTimeMillis()), endSc);
+            System.out.println(schedules);
+
         }
+
+
+
+
+        return result;
     }
 }
