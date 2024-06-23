@@ -113,6 +113,9 @@ public class LocationController {
             minTimeResult = Subway.minTimeRoute(subwayMap, from, to);
         }
 
+        // Transfers 횟수가 같으면, minTransferRoute <- minTimeRoute 대치
+        if (minTransferResult.getTransfers() == minTimeResult.getTransfers()) minTransferResult = minTimeResult;
+
         // schedule 테이블 연결, 운행 시간표 적용
         minTransferResult = applySchedule(minTransferResult);
         minTimeResult = applySchedule(minTimeResult);
@@ -144,6 +147,7 @@ public class LocationController {
         if (result.transfers != 0) {    // 환승인 경우
             List<List<String>> paths = splitTransferPaths(result.path);
             Time arrivalTime = null;
+            int line = 0;
             for(List<String> p : paths){
                 int startCd = Integer.parseInt(p.get(0).split("\\|")[0]);
                 int endCd = Integer.parseInt(p.get(p.size()-1).split("\\|")[0]);
@@ -158,10 +162,11 @@ public class LocationController {
 
 
                 for (int i = 0; i < p.size(); i++) {
-                    String change = result.path.get(i);
+                    String change = p.get(i);
                     arrivalTime = schedules.get(i).getArrival_time();
                     change += "|" + arrivalTime.toString();  // 운행 시간표까지 붙이기
-                    result.path.set(i, change);
+                    result.path.set(line, change);
+                    line++;
                 }
                 time = arrivalTime.toLocalTime();
             }

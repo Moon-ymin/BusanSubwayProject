@@ -1,6 +1,7 @@
 package com.busanit.busan_subway_project;
 
 import lombok.AllArgsConstructor;
+import lombok.Data;
 
 import java.util.*;
 
@@ -45,6 +46,7 @@ public class Subway {
             this.path.add(code + "|" + name + "|" + line);
         }
     }
+    @Data
     public static class Result {   // 최종 결과 저장 : (Route)경로 리스트, 환승 횟수, 총 소요 시간
         public List<String> path;
         public int transfers;
