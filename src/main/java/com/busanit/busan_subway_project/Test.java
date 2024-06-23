@@ -90,6 +90,9 @@ public class Test implements CommandLineRunner {
         Subway.Result Result = Subway.minTransferRoute(subwayMap, 912, 917);
         Subway.Result Result2 = Subway.minTimeRoute(subwayMap, 912, 917);
 
+        // Transfers 횟수가 같으면, minTransferRoute <- minTimeRoute 대치
+        if (Result.getTransfers() == Result2.getTransfers()) Result = Result2;
+
         // schedule 테이블 연결, 운행 시간표 적용
         Result = applySchedule(Result);
         Result2 = applySchedule(Result2);

@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.sql.Time;
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -113,6 +114,9 @@ public class LocationController {
             minTimeResult = Subway.minTimeRoute(subwayMap, from, to);
         }
 
+        // Transfers 횟수가 같으면, minTransferRoute <- minTimeRoute 대치
+        if (minTransferResult.getTransfers() == minTimeResult.getTransfers()) minTransferResult = minTimeResult;
+
         // schedule 테이블 연결, 운행 시간표 적용
         minTransferResult = applySchedule(minTransferResult);
         minTimeResult = applySchedule(minTimeResult);
@@ -141,9 +145,10 @@ public class LocationController {
             }
         }
         // 추가로 direction, scode(start, end) 필요
-        if (result.transfers != 0) {    // 환승인 경우
+        if (result.transfers != 0) {    // 환승인 경우 - totalTimes 달라짐
             List<List<String>> paths = splitTransferPaths(result.path);
             Time arrivalTime = null;
+            int line = 0;
             for(List<String> p : paths){
                 int startCd = Integer.parseInt(p.get(0).split("\\|")[0]);
                 int endCd = Integer.parseInt(p.get(p.size()-1).split("\\|")[0]);
@@ -158,13 +163,17 @@ public class LocationController {
 
 
                 for (int i = 0; i < p.size(); i++) {
-                    String change = result.path.get(i);
+                    String change = p.get(i);
                     arrivalTime = schedules.get(i).getArrival_time();
                     change += "|" + arrivalTime.toString();  // 운행 시간표까지 붙이기
-                    result.path.set(i, change);
+                    result.path.set(line, change);
+                    line++;
                 }
                 time = arrivalTime.toLocalTime();
             }
+            // 환승의 경우 totalTime 시간이 달라짐
+            Duration duration = Duration.between(LocalTime.parse(result.path.get(0).split("\\|")[3]), time);
+            result.totalTime = (int) duration.toSeconds(); // 달라진 totalTime을 result.totalTime 에 할당
         } else {    // 환승아닌경우
             int startCd = Integer.parseInt(result.path.get(0).split("\\|")[0]); // scode|sname|line_cd
             int endCd = Integer.parseInt(result.path.get(result.path.size() - 1)
