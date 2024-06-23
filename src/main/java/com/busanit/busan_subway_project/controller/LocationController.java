@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.sql.Time;
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -144,7 +145,7 @@ public class LocationController {
             }
         }
         // 추가로 direction, scode(start, end) 필요
-        if (result.transfers != 0) {    // 환승인 경우
+        if (result.transfers != 0) {    // 환승인 경우 - totalTimes 달라짐
             List<List<String>> paths = splitTransferPaths(result.path);
             Time arrivalTime = null;
             int line = 0;
@@ -170,6 +171,9 @@ public class LocationController {
                 }
                 time = arrivalTime.toLocalTime();
             }
+            // 환승의 경우 totalTime 시간이 달라짐
+            Duration duration = Duration.between(LocalTime.parse(result.path.get(0).split("\\|")[3]), time);
+            result.totalTime = (int) duration.toSeconds(); // 달라진 totalTime을 result.totalTime 에 할당
         } else {    // 환승아닌경우
             int startCd = Integer.parseInt(result.path.get(0).split("\\|")[0]); // scode|sname|line_cd
             int endCd = Integer.parseInt(result.path.get(result.path.size() - 1)
