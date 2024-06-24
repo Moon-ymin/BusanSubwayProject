@@ -7,6 +7,7 @@ import com.busanit.busan_subway_project.service.MetroService;
 import com.busanit.busan_subway_project.service.ScheduleService;
 import com.busanit.busan_subway_project.service.StationService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cglib.core.Local;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -115,7 +116,7 @@ public class LocationController {
         }
 
         // Transfers 횟수가 같으면, minTransferRoute <- minTimeRoute 대치
-        if (minTransferResult.getTransfers() == minTimeResult.getTransfers()) minTransferResult = minTimeResult;
+        if (minTransferResult.getTransfers() == minTimeResult.getTransfers()) minTransferResult = new Subway.Result(minTimeResult);
 
         // schedule 테이블 연결, 운행 시간표 적용
         minTransferResult = applySchedule(minTransferResult);
@@ -171,7 +172,7 @@ public class LocationController {
                 }
                 time = arrivalTime.toLocalTime();
             }
-            // 환승의 경우 totalTime 시간이 달라짐
+            // 환승의 경우 totalTime 시간에 대기 시간도 포함해야 함
             Duration duration = Duration.between(LocalTime.parse(result.path.get(0).split("\\|")[3]), time);
             result.totalTime = (int) duration.toSeconds(); // 달라진 totalTime을 result.totalTime 에 할당
         } else {    // 환승아닌경우
@@ -192,6 +193,10 @@ public class LocationController {
                 change += "|" + schedules.get(i).getArrival_time().toString();  // 운행 시간표까지 붙이기
                 result.path.set(i, change);
             }
+            // 도착지 시간 - 출발지 시간 으로 totalTime 갱신
+            Duration duration = Duration.between(LocalTime.parse(result.path.get(0).split("\\|")[3]),
+                    LocalTime.parse(result.path.get(result.path.size()-1).split("\\|")[3]));
+            result.totalTime = (int) duration.toSeconds();
         }
 
         return result;
