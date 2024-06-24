@@ -58,6 +58,13 @@ public class Subway {
             this.totalTime = totalTime;
         }
 
+        // minTimeResult 와 minTransferResult 가 같은 경우 - 깊은 복사
+        public Result(Result result) {
+            this.transfers = result.transfers;
+            this.totalTime = result.totalTime;
+            this.path = new ArrayList<>(result.path);
+        }
+
         public void merge(Result other) {
             // 중복되지 않게 다른 경로의 첫 번째 역을 제외하고 병합
             if (!this.path.isEmpty() && !other.path.isEmpty()) {
