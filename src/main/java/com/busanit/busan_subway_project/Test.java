@@ -13,6 +13,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import java.sql.Time;
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -87,8 +88,9 @@ public class Test implements CommandLineRunner {
             subwayMap.put(key, startStage);
         }
 // 122, 209
-        Subway.Result Result = Subway.minTransferRoute(subwayMap, 912, 917);
-        Subway.Result Result2 = Subway.minTimeRoute(subwayMap, 912, 917);
+        // 수영역에서 환승안됨
+        Subway.Result Result = Subway.minTransferRoute(subwayMap, 302, 209);
+        Subway.Result Result2 = Subway.minTimeRoute(subwayMap, 302, 209);
 
         // Transfers 횟수가 같으면, minTransferRoute <- minTimeRoute 대치
         if (Result.getTransfers() == Result2.getTransfers()) Result = Result2;
@@ -98,6 +100,7 @@ public class Test implements CommandLineRunner {
         Result2 = applySchedule(Result2);
 
     }
+    // 운행 시간표 추가하는 메서드
     // 운행 시간표 추가하는 메서드
     private Subway.Result applySchedule(Subway.Result result) {
         // time : Time 타입, 일단은 현재 시간 넣을 거임
@@ -117,9 +120,10 @@ public class Test implements CommandLineRunner {
             }
         }
         // 추가로 direction, scode(start, end) 필요
-        if (result.transfers != 0) {    // 환승인 경우
+        if (result.transfers != 0) {    // 환승인 경우 - totalTimes 달라짐
             List<List<String>> paths = splitTransferPaths(result.path);
             Time arrivalTime = null;
+            int line = 0;
             for(List<String> p : paths){
                 int startCd = Integer.parseInt(p.get(0).split("\\|")[0]);
                 int endCd = Integer.parseInt(p.get(p.size()-1).split("\\|")[0]);
@@ -134,13 +138,17 @@ public class Test implements CommandLineRunner {
 
 
                 for (int i = 0; i < p.size(); i++) {
-                    String change = result.path.get(i);
+                    String change = p.get(i);
                     arrivalTime = schedules.get(i).getArrival_time();
                     change += "|" + arrivalTime.toString();  // 운행 시간표까지 붙이기
-                    result.path.set(i, change);
+                    result.path.set(line, change);
+                    line++;
                 }
                 time = arrivalTime.toLocalTime();
             }
+            // 환승의 경우 totalTime 시간에 대기 시간도 포함해야 함
+            Duration duration = Duration.between(LocalTime.parse(result.path.get(0).split("\\|")[3]), time);
+            result.totalTime = (int) duration.toSeconds(); // 달라진 totalTime을 result.totalTime 에 할당
         } else {    // 환승아닌경우
             int startCd = Integer.parseInt(result.path.get(0).split("\\|")[0]); // scode|sname|line_cd
             int endCd = Integer.parseInt(result.path.get(result.path.size() - 1)
@@ -159,10 +167,15 @@ public class Test implements CommandLineRunner {
                 change += "|" + schedules.get(i).getArrival_time().toString();  // 운행 시간표까지 붙이기
                 result.path.set(i, change);
             }
+            // 도착지 시간 - 출발지 시간 으로 totalTime 갱신
+            Duration duration = Duration.between(LocalTime.parse(result.path.get(0).split("\\|")[3]),
+                    LocalTime.parse(result.path.get(result.path.size()-1).split("\\|")[3]));
+            result.totalTime = (int) duration.toSeconds();
         }
 
         return result;
     }
+    // 운행 경로 같은 호선 끼리 나누는 메서드
     private List<List<String>> splitTransferPaths(List<String> resultpath){
         List<List<String>> transferLines = new ArrayList<>(); // 호선 다른 경로끼리 묶여진 이중 배열
         List<String> currentLine = new ArrayList<>();  // 호선 같은 애들 담은 배열

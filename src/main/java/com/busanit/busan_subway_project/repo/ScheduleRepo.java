@@ -15,7 +15,9 @@ public interface ScheduleRepo extends JpaRepository<Schedule, Integer> {
     @Query(value = "SELECT * FROM schedule s WHERE s.continuity = " +
             "(SELECT sc.continuity FROM schedule sc WHERE sc.direction = :direction " +
             "AND sc.day = :day AND sc.scode = :start " +
-            "AND sc.arrival_time >= :time LIMIT 1) " +
+            "AND sc.arrival_time >= :time " +
+            "order by arrival_time " +
+            "LIMIT 1) " +
             "AND s.scode BETWEEN :small AND :big " +
             "ORDER BY s.schedule_id", nativeQuery = true)
     List<Schedule> findSchedules(@Param("start") int start,
