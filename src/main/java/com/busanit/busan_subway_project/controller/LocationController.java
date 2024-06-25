@@ -36,7 +36,7 @@ public class LocationController {
     @Autowired
     private ScheduleService scheduleService;
     private LocalDate localDate;
-    private LocalTime time;
+    private String timeStr;
 
     @PostMapping("/location")
     public ResultWrapper receiveLocationData(@RequestBody LocationData locationData) {
@@ -44,6 +44,7 @@ public class LocationController {
         Integer from = locationData.getFrom();
         Integer via = locationData.getVia();
         Integer to = locationData.getTo();
+        timeStr = locationData.getSettingTime();
 
         // 2. 최소환승, 최단경로 메서드 수행하기
         // 1) 객체 생성
@@ -130,7 +131,8 @@ public class LocationController {
     // 운행 시간표 추가하는 메서드
     private Subway.Result applySchedule(Subway.Result result) {
         // time : Time 타입, 일단은 현재 시간 넣을 거임
-        time = LocalTime.now();    // 19:15:49.934230
+        LocalTime time = LocalTime.parse(timeStr);
+        // time = LocalTime.now();    // 19:15:49.934230
 
         // day : (평일 : 1, 토요일 : 2, 공휴일 : 3)
         localDate = LocalDate.now();    // 현재 서버 날짜
