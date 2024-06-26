@@ -93,7 +93,7 @@ public class LocationController {
             // 3. subwayMap 객체 추가
             subwayMap.put(key, startStage);
         }
-
+        System.out.println("");
         // 3. 결과 안드로이드에 전송하기 - 최소환승 경로 및 최단시간 경로 계산
         Subway.Result minTransferResult;
         Subway.Result minTimeResult;
@@ -149,6 +149,33 @@ public class LocationController {
         }
         // 추가로 direction, scode(start, end) 필요
         if (result.transfers != 0) {    // 환승인 경우 - totalTimes 달라짐
+            // 환승하러 가는 도보시간 : HashMap 구조
+            Map<Integer, Time> walkingTime = Map.ofEntries(
+                    Map.entry(119, Time.valueOf("00:02:00")),
+                    Map.entry(219, Time.valueOf("00:02:00")),
+                    Map.entry(123, Time.valueOf("00:02:00")),
+                    Map.entry(305, Time.valueOf("00:02:00")),
+                    Map.entry(124, Time.valueOf("00:06:30")),
+                    Map.entry(804, Time.valueOf("00:06:30")),
+                    Map.entry(125, Time.valueOf("00:06:00")),
+                    Map.entry(402, Time.valueOf("00:06:00")),
+                    Map.entry(205, Time.valueOf("00:10:30")),
+                    Map.entry(810, Time.valueOf("00:10:30")),
+                    Map.entry(208, Time.valueOf("00:01:00")),
+                    Map.entry(301, Time.valueOf("00:01:00")),
+                    Map.entry(227, Time.valueOf("00:07:00")),
+                    Map.entry(901, Time.valueOf("00:07:00")),
+                    Map.entry(233, Time.valueOf("00:02:00")),
+                    Map.entry(313, Time.valueOf("00:02:00")),
+                    Map.entry(306, Time.valueOf("00:08:00")),
+                    Map.entry(803, Time.valueOf("00:08:00")),
+                    Map.entry(309, Time.valueOf("00:01:00")),
+                    Map.entry(401, Time.valueOf("00:01:00")),
+                    Map.entry(317, Time.valueOf("00:03:00")),
+                    Map.entry(907, Time.valueOf("00:03:00"))
+            );
+
+
             List<List<String>> paths = splitTransferPaths(result.path);
             Time arrivalTime = null;
             int line = 0;
@@ -172,7 +199,10 @@ public class LocationController {
                     result.path.set(line, change);
                     line++;
                 }
+                // 환승하는 경우, 환승하는데 도보시간도 추가
+                arrivalTime = addTimes(arrivalTime, walkingTime.get(endCd));
                 time = arrivalTime.toLocalTime();
+
             }
             // 환승의 경우 totalTime 시간에 대기 시간도 포함해야 함
             Duration duration = Duration.between(LocalTime.parse(result.path.get(0).split("\\|")[3]), time);
@@ -221,5 +251,14 @@ public class LocationController {
         if (!currentLine.isEmpty()) transferLines.add(currentLine); // 마지막 경로 담기
 
         return transferLines;
+    }
+    // 환승할 때 도보시간 더하는 메서드
+    public static Time addTimes(Time time1, Time time2) {
+        LocalTime localTime1 = time1.toLocalTime();
+        LocalTime localTime2 = time2.toLocalTime();
+
+        LocalTime resultTime = localTime1.plus(Duration.between(LocalTime.MIDNIGHT, localTime2));
+
+        return Time.valueOf(resultTime);
     }
 }
