@@ -1,6 +1,6 @@
 # 🚉 Busan Subway Project
 ## 🔍 Overview
-![image](https://github.com/Moon-ymin/programmers_before/assets/83321379/21c5a1e6-5d84-4501-8347-5b463533e3a2)
+![bsp_app_icon](https://github.com/Moon-ymin/BusanSubwayProject/assets/83321379/ff0eea90-6443-40c6-a90d-b479525174a0)
 - BSP (2024년 6월 11일 ~ 2024년 6월 27일)
 - 부산 지하철 운행 정보 앱 제작
 #### 프로젝트 목표 및 목적
