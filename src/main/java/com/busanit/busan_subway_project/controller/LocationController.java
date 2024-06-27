@@ -7,7 +7,6 @@ import com.busanit.busan_subway_project.service.MetroService;
 import com.busanit.busan_subway_project.service.ScheduleService;
 import com.busanit.busan_subway_project.service.StationService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cglib.core.Local;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -178,7 +177,7 @@ public class LocationController {
 
             List<List<String>> paths = splitTransferPaths(result.path);
             Time arrivalTime = null;
-            int line = 0;
+            int line = 0;   // 경로에서 지나가는 path의 개수
             for(List<String> p : paths){
                 int startCd = Integer.parseInt(p.get(0).split("\\|")[0]);
                 int endCd = Integer.parseInt(p.get(p.size()-1).split("\\|")[0]);
@@ -200,7 +199,9 @@ public class LocationController {
                     line++;
                 }
                 // 환승하는 경우, 환승하는데 도보시간도 추가
-                arrivalTime = addTimes(arrivalTime, walkingTime.get(endCd));
+                if (line < paths.size()) {  // 마지막에 환승역지나더라도 도보시간 더해지면 안됨
+                    arrivalTime = addTimes(arrivalTime, walkingTime.get(endCd));
+                }
                 time = arrivalTime.toLocalTime();
 
             }
